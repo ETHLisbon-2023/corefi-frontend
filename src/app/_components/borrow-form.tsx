@@ -67,8 +67,7 @@ export function BorrowForm() {
         <CardTitle>Borrow</CardTitle>
         <CardDescription>
           Secure a USDT loan using your Core tokens as collateral. Just enter
-          the amount, adjust the collateral ratio, and confirm. Quick, seamless,
-          and automated.
+          the amount, adjust the collateral ratio, and confirm.
         </CardDescription>
       </CardHeader>
       <CardContent>
