@@ -40,7 +40,8 @@ export function LendForm() {
   function onSubmit(data: z.infer<typeof FormSchema>) {
     console.log(data.amount)
     toast({
-      title: `Funds in the amount of ${data.amount} USDT have been credited to your wallet.`,
+      description: `Your transaction has been successfully completed! You have lent out ${data.amount} USDT.`,
+      title: 'Success!',
     })
   }
 

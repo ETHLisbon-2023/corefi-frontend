@@ -1,5 +1,6 @@
 'use client'
 
+import { BorrowForm } from '@/app/_components/BorrowForm'
 import { LendForm } from '@/app/_components/LendForm'
 import { Button } from '@/components/ui/button'
 import {
@@ -27,36 +28,7 @@ export default function Home() {
           <LendForm />
         </TabsContent>
         <TabsContent value="borrow">
-          <Card>
-            <CardHeader>
-              <CardTitle>Borrow</CardTitle>
-              <CardDescription>
-                The collateral amount is 0 Core tokens.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="space-y-1">
-                <Label htmlFor="borrow-amount">Amount</Label>
-                <Input defaultValue="0" id="borrow-amount" />
-              </div>
-              <div className="space-y-1">
-                <Label className="mb-3 block" htmlFor="borrow-ratio">
-                  Ratio
-                </Label>
-                <Slider
-                  defaultValue={[1]}
-                  id="borrow-ratio"
-                  max={3}
-                  min={1}
-                  onValueChange={console.log}
-                  step={0.1}
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button>Borrow</Button>
-            </CardFooter>
-          </Card>
+          <BorrowForm />
         </TabsContent>
       </Tabs>
     </main>
