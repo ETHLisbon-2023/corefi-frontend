@@ -4,6 +4,9 @@ const nextConfig = {
     config.externals.push('pino-pretty', 'lokijs', 'encoding')
     return config
   },
+  experimental: {
+    webpackBuildWorker: true,
+  },
 }
 
 module.exports = nextConfig
