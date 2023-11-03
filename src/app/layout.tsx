@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import type { PropsWithChildren } from 'react'
 
 import { ThemeProvider } from '@/components/theme-provider'
+import { Toaster } from '@/components/ui/toaster'
 import { Martian_Mono } from 'next/font/google'
 
 import './globals.css'
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           enableSystem
         >
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

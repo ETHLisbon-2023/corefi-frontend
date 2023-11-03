@@ -38,7 +38,7 @@ export function LendForm() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(123)
+    console.log(data.amount)
     toast({
       title: `Funds in the amount of ${data.amount} USDT have been credited to your wallet.`,
     })
