@@ -3,6 +3,7 @@ import type { PropsWithChildren } from 'react'
 
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
+import { WagmiConfig } from '@/components/wagmi-config'
 import { Martian_Mono } from 'next/font/google'
 
 import './globals.css'
@@ -31,7 +32,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           disableTransitionOnChange
           enableSystem
         >
-          {children}
+          <WagmiConfig>{children}</WagmiConfig>
           <Toaster />
         </ThemeProvider>
       </body>
