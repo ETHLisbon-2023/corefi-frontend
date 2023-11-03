@@ -15,3 +15,6 @@ insert_final_newline = false
 
 [*.svg]
 insert_final_newline = false
+
+[*.txt]
+insert_final_newline = false
