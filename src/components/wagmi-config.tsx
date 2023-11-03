@@ -18,7 +18,14 @@ const metadata = {
 const chains = [coreDao]
 const wagmiConfig = defaultWagmiConfig({ chains, metadata, projectId })
 
-createWeb3Modal({ chains, projectId, wagmiConfig })
+createWeb3Modal({
+  chains,
+  projectId,
+  themeVariables: {
+    '--w3m-font-family': 'Martian Mono, monospace',
+  },
+  wagmiConfig,
+})
 
 export function WagmiConfig({ children }: PropsWithChildren) {
   return <Config config={wagmiConfig}>{children}</Config>

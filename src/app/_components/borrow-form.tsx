@@ -21,6 +21,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { toast } from '@/components/ui/use-toast'
+import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -33,15 +34,22 @@ const FormSchema = z.object({
 })
 
 export function BorrowForm() {
+  const { address, open } = useWalletConnect()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
       amount: '',
-      ratio: [1],
+      ratio: [1.5],
     },
     resolver: zodResolver(FormSchema),
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    if (!address) {
+      open()
+      return
+    }
+
     const ratio = data.ratio[0]
     const amount = Number(data.amount)
 
@@ -58,7 +66,9 @@ export function BorrowForm() {
       <CardHeader>
         <CardTitle>Borrow</CardTitle>
         <CardDescription>
-          The collateral amount is 0 Core tokens.
+          Secure a USDT loan using your Core tokens as collateral. Just enter
+          the amount, adjust the collateral ratio, and confirm. Quick, seamless,
+          and automated.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -88,7 +98,7 @@ export function BorrowForm() {
                     <Slider
                       {...field}
                       max={3}
-                      min={1}
+                      min={1.5}
                       onValueChange={value => {
                         field.onChange(value)
                       }}

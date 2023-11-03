@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
+import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -30,6 +31,8 @@ const FormSchema = z.object({
 })
 
 export function LendForm() {
+  const { address, open } = useWalletConnect()
+
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
       amount: '',
@@ -38,7 +41,11 @@ export function LendForm() {
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log(data.amount)
+    if (!address) {
+      open()
+      return
+    }
+
     toast({
       description: `Your transaction has been successfully completed! You have lent out ${data.amount} USDT.`,
       title: 'Success!',
@@ -49,7 +56,12 @@ export function LendForm() {
     <Card>
       <CardHeader>
         <CardTitle>Lend</CardTitle>
-        <CardDescription>Make a deposit in USDT.</CardDescription>
+        <CardDescription>
+          Lend out your USDT and earn competitive returns. Simply input the
+          amount you wish to lend and hit Submit button. Your USDT will be
+          loaned out securely, and you&apos;ll receive your returns
+          automatically.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>

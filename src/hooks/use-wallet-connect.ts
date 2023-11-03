@@ -3,10 +3,11 @@ import { useAccount } from 'wagmi'
 
 export function useWalletConnect() {
   const { open } = useWeb3Modal()
-  const { address, isConnecting } = useAccount()
+  const { address, isConnecting, isDisconnected } = useAccount()
 
   return {
     address,
+    isConnected: address && !isDisconnected,
     isConnecting,
     open,
   }
