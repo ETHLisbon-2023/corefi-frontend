@@ -8,6 +8,7 @@ import { WagmiConfig as Config } from 'wagmi'
 import { coreDao } from 'wagmi/chains'
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string
+const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true'
 
 const metadata = {
   description: 'Web3Modal Example',
@@ -39,7 +40,7 @@ const coreDaoTestnet = defineChain({
   testnet: true,
 })
 
-const chains = [coreDao, coreDaoTestnet]
+const chains = [isTestnet ? coreDaoTestnet : coreDao]
 const wagmiConfig = defaultWagmiConfig({ chains, metadata, projectId })
 
 createWeb3Modal({
