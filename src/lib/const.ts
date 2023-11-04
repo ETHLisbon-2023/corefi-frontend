@@ -16,19 +16,6 @@ export const abi = [
     type: 'constructor',
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: '_ltv',
-        type: 'uint256',
-      },
-    ],
-    name: 'LogCheckLTV',
-    type: 'event',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -263,6 +250,19 @@ export const abi = [
       {
         internalType: 'uint256',
         name: '_treasury',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getUserDepositedAmount',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
         type: 'uint256',
       },
     ],

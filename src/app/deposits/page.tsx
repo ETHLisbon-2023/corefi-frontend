@@ -21,7 +21,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { toast } from '@/components/ui/use-toast'
-import { useAction } from '@/hooks/use-action'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { abi, coreFiContractAddress } from '@/lib/const'
 import {
@@ -165,67 +164,76 @@ export default function Deposits() {
     }
   }
 
+  console.log(deposits)
+
   return (
     <div className="mx-auto mb-8 mt-8 w-full max-w-6xl px-4">
-      {profit && profit > 0 ? (
-        <section className="mb-10">
-          <CardTitle className="mb-6">Interest</CardTitle>
-          <CardDescription className="mb-2">
-            Your interest is{' '}
-            <span className="font-meduim text-black dark:text-white">
-              {formatCoreTokens(profit!)}
-            </span>{' '}
-            CORE
-          </CardDescription>
-          <Button isLoading={isClaimLoading} onClick={onClaimProfit}>
-            Claim
-          </Button>
-        </section>
-      ) : null}
       {deposits && deposits.length > 0 ? (
-        <section className="mb-10">
-          <CardTitle className="mb-6">Withdraw</CardTitle>
-          <Form {...form}>
-            <form
-              className="flex items-end gap-4"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        autoComplete="off"
-                        placeholder="1000 USDT"
-                        type="number"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                onClick={() => {
-                  form.setValue(
-                    'amount',
-                    (Number(maxToWithdraw) / 1e6).toString(),
-                  )
-                  form.setFocus('amount')
-                }}
-                type="button"
-                variant="secondary"
+        <>
+          <section className="mb-10">
+            <CardTitle className="mb-6">Interest</CardTitle>
+            <CardDescription className="mb-2">
+              Your interest is{' '}
+              <span className="font-meduim text-black dark:text-white">
+                {formatCoreTokens(profit!)}
+              </span>{' '}
+              CORE
+            </CardDescription>
+            <Button isLoading={isClaimLoading} onClick={onClaimProfit}>
+              Claim
+            </Button>
+          </section>
+          <section className="mb-10">
+            <CardTitle className="mb-6">Withdraw</CardTitle>
+            <CardDescription className="mb-2">
+              You have lent{' '}
+              <span className="font-meduim text-black dark:text-white">
+                {formatUsdt(maxToWithdraw!)}
+              </span>{' '}
+              USDT to our service.
+            </CardDescription>
+            <Form {...form}>
+              <form
+                className="flex items-end gap-4"
+                onSubmit={form.handleSubmit(onSubmit)}
               >
-                Max
-              </Button>
-              <Button isLoading={isWithdrawLoading} type="submit">
-                Withdraw
-              </Button>
-            </form>
-          </Form>
-        </section>
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          autoComplete="off"
+                          placeholder="1000 USDT"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button
+                  onClick={() => {
+                    form.setValue(
+                      'amount',
+                      (Number(maxToWithdraw) / 1e6).toString(),
+                    )
+                    form.setFocus('amount')
+                  }}
+                  type="button"
+                  variant="secondary"
+                >
+                  Max
+                </Button>
+                <Button isLoading={isWithdrawLoading} type="submit">
+                  Withdraw
+                </Button>
+              </form>
+            </Form>
+          </section>
+        </>
       ) : null}
       <section>
         <CardTitle className="mb-6">List of your deposits</CardTitle>
