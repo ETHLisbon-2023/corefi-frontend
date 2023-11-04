@@ -63,6 +63,12 @@ export function BorrowForm({ coingeckoPromise }: Props) {
     const amount = Number(data.amount)
 
     try {
+      console.log({
+        args: [BigInt(31536000), BigInt(amount * 1000000)],
+        value: BigInt(
+          Math.floor(amount * ratio * course.coredaoorg.usd * 1000000),
+        ),
+      })
       await borrow({
         args: [BigInt(31536000), BigInt(amount * 1000000)],
         value: BigInt(
