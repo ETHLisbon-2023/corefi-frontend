@@ -63,23 +63,15 @@ export function BorrowForm({ coingeckoPromise }: Props) {
     const amount = Number(data.amount)
 
     try {
-      console.log({
-        args: [BigInt(31536000), BigInt(amount * 1000000)],
-        value: BigInt(
-          Math.floor(amount * ratio * course.coredaoorg.usd * 1000000),
-        ),
-      })
       await borrow({
         args: [BigInt(31536000), BigInt(amount * 1000000)],
         value: BigInt(
-          Math.floor(amount * ratio * course.coredaoorg.usd * 1000000),
+          Math.floor(amount * ratio * (1 / course.coredaoorg.usd) * 1e18),
         ),
       })
 
       toast({
-        description: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}. The equivalent of ${
-          amount * ratio
-        } USDT in Core tokens has been automatically reserved as collateral from your account.`,
+        description: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}.`,
         title: 'Success!',
       })
     } catch (e) {
@@ -97,17 +89,15 @@ export function BorrowForm({ coingeckoPromise }: Props) {
       <CardHeader>
         <CardTitle>Borrow</CardTitle>
         <CardDescription>
-          <p className="mb-3">
-            Secure a USDT loan using your Core tokens as collateral. Just enter
-            the amount, adjust the collateral ratio, and confirm.
-          </p>
-          <p>
-            Core token (CORE) is currently priced at{' '}
-            <span className="font-medium text-black dark:text-white">
-              {course.coredaoorg.usd.toFixed(2)}
-            </span>{' '}
-            USDT.
-          </p>
+          Secure a USDT loan using your Core tokens as collateral. Just enter
+          the amount, adjust the collateral ratio, and confirm.
+          <br />
+          <br />
+          Core token (CORE) is currently priced at{' '}
+          <span className="font-medium text-black dark:text-white">
+            {course.coredaoorg.usd.toFixed(2)}
+          </span>{' '}
+          USDT.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -133,7 +123,7 @@ export function BorrowForm({ coingeckoPromise }: Props) {
                       {(
                         Number(field.value) *
                         Number(form.watch('ratio')) *
-                        course.coredaoorg.usd
+                        (1 / course.coredaoorg.usd)
                       ).toFixed(2)}
                     </span>{' '}
                     CORE (Core token price is not updated automatically, the
