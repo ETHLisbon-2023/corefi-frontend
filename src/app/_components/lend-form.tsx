@@ -1,7 +1,6 @@
 'use client'
 
-import { Spinner } from '@/components/spinner'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/button'
 import {
   Card,
   CardContent,
@@ -19,14 +18,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toast } from '@/components/ui/use-toast'
+import { useAction } from '@/hooks/use-action'
 import { useContract } from '@/hooks/use-contract'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { coreFiContractAddress } from '@/lib/const'
-import { parseErrors } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { waitForTransaction } from '@wagmi/core'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -37,9 +34,9 @@ const FormSchema = z.object({
 })
 
 export function LendForm() {
-  const [isLoading, setIsLoading] = useState(false)
   const { address, open } = useWalletConnect()
   const { approve, lend } = useContract()
+  const { action, isLoading } = useAction()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
@@ -48,41 +45,28 @@ export function LendForm() {
     resolver: zodResolver(FormSchema),
   })
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: z.infer<typeof FormSchema>) {
     if (!address) {
       open()
       return
     }
 
-    const amount = BigInt(Number(data.amount) * 1000000)
+    action({
+      run: async () => {
+        const amount = BigInt(Number(data.amount) * 1000000)
 
-    try {
-      setIsLoading(true)
-      const { hash } = await approve({
-        args: [coreFiContractAddress, amount],
-      })
-      await waitForTransaction({ hash })
-      await lend({
-        args: [amount],
-      })
+        const { hash } = await approve({
+          args: [coreFiContractAddress, amount],
+        })
+        await waitForTransaction({ hash })
+        await lend({
+          args: [amount],
+        })
 
-      form.reset()
-
-      toast({
-        description: `Your transaction has been successfully completed! You have lent out ${data.amount} USDT.`,
-        title: 'Success!',
-        variant: 'default',
-      })
-    } catch (e) {
-      console.error(e)
-      toast({
-        description: parseErrors((e as any)?.message as string),
-        title: 'Error',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsLoading(false)
-    }
+        form.reset()
+      },
+      successMessage: `Your transaction has been successfully completed! You have lent out ${data.amount} USDT.`,
+    })
   }
 
   return (
@@ -121,15 +105,8 @@ export function LendForm() {
         </Form>
       </CardContent>
       <CardFooter className="block">
-        <Button disabled={isLoading} form="lend-form" type="submit">
-          {isLoading ? (
-            <>
-              <Spinner />
-              Please wait
-            </>
-          ) : (
-            'Submit'
-          )}
+        <Button form="lend-form" isLoading={isLoading} type="submit">
+          Submit
         </Button>
         {isLoading && (
           <CardDescription className="mt-2 text-sm">

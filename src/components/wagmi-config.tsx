@@ -48,6 +48,7 @@ createWeb3Modal({
   projectId,
   themeVariables: {
     '--w3m-font-family': 'Martian Mono, monospace',
+    '--w3m-font-size-master': '8px',
   },
   wagmiConfig,
 })

@@ -21,96 +21,12 @@ export const abi = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'latestPrice',
+        name: '_ltv',
         type: 'uint256',
       },
     ],
-    name: 'FetchLatestPrice',
+    name: 'LogCheckLTV',
     type: 'event',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'coreTokenValue',
-        type: 'uint256',
-      },
-    ],
-    name: 'CoreTokenToUSDT',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '_usdtValue',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'FAKERESERVE',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'ONEYEAR',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'USDT',
-    outputs: [
-      {
-        internalType: 'contract IERC20',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'USDT_Borrow',
-    outputs: [
-      {
-        internalType: 'contract IERC20',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'USDT_Lending',
-    outputs: [
-      {
-        internalType: 'contract IERC20',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
   },
   {
     inputs: [
@@ -124,6 +40,11 @@ export const abi = [
     outputs: [
       {
         components: [
+          {
+            internalType: 'uint256',
+            name: 'nonce',
+            type: 'uint256',
+          },
           {
             internalType: 'address',
             name: 'borrower',
@@ -141,12 +62,27 @@ export const abi = [
           },
           {
             internalType: 'uint256',
+            name: 'interestSubtracted',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'borrowedDate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
             name: 'dueDate',
             type: 'uint256',
           },
           {
             internalType: 'bool',
             name: 'payedBack',
+            type: 'bool',
+          },
+          {
+            internalType: 'bool',
+            name: 'liquidated',
             type: 'bool',
           },
         ],
@@ -164,26 +100,7 @@ export const abi = [
     outputs: [
       {
         internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: '_sender',
-        type: 'address',
-      },
-    ],
-    name: 'balanceOfB',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '_balance',
+        name: '_position',
         type: 'uint256',
       },
     ],
@@ -224,62 +141,14 @@ export const abi = [
         type: 'uint256',
       },
     ],
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
-    inputs: [
-      {
-        components: [
-          {
-            internalType: 'uint256',
-            name: 'amount',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'timestamp',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'interestRate',
-            type: 'uint256',
-          },
-        ],
-        internalType: 'struct Lending.Deposit',
-        name: '_deposit',
-        type: 'tuple',
-      },
-    ],
-    name: 'computeYield',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: '_depositNonce',
-        type: 'uint256',
-      },
-    ],
-    name: 'computeYield',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
+    inputs: [],
+    name: 'claimYield',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -320,10 +189,55 @@ export const abi = [
         name: 'timestamp',
         type: 'uint256',
       },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+    ],
+    name: 'getDepositedAmountByAddress',
+    outputs: [
       {
         internalType: 'uint256',
-        name: 'interestRate',
+        name: '_amount',
         type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
+      },
+    ],
+    name: 'getDepositsByAddress',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'amount',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'timestamp',
+            type: 'uint256',
+          },
+        ],
+        internalType: 'struct Lending.Deposit[]',
+        name: '_deposits',
+        type: 'tuple[]',
       },
     ],
     stateMutability: 'view',
@@ -335,7 +249,20 @@ export const abi = [
     outputs: [
       {
         internalType: 'uint256',
-        name: '',
+        name: '_total',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getTreasury',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '_treasury',
         type: 'uint256',
       },
     ],
@@ -345,17 +272,64 @@ export const abi = [
   {
     inputs: [
       {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
+        internalType: 'address',
+        name: 'user',
+        type: 'address',
       },
     ],
-    name: 'getTimePassed',
+    name: 'getUserLoans',
     outputs: [
       {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'nonce',
+            type: 'uint256',
+          },
+          {
+            internalType: 'address',
+            name: 'borrower',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'loanSize',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'collateral',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'interestSubtracted',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'borrowedDate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'dueDate',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'payedBack',
+            type: 'bool',
+          },
+          {
+            internalType: 'bool',
+            name: 'liquidated',
+            type: 'bool',
+          },
+        ],
+        internalType: 'struct Borrow.LoanParams[]',
+        name: '_loans',
+        type: 'tuple[]',
       },
     ],
     stateMutability: 'view',
@@ -397,7 +371,7 @@ export const abi = [
         type: 'uint256[]',
       },
     ],
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -421,45 +395,6 @@ export const abi = [
         internalType: 'uint256',
         name: '',
         type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'priceFetcher',
-    outputs: [
-      {
-        internalType: 'contract IPriceFetcher',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'priceFetcherBorrow',
-    outputs: [
-      {
-        internalType: 'contract IPriceFetcher',
-        name: '',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'priceFetcherLending',
-    outputs: [
-      {
-        internalType: 'contract IPriceFetcher',
-        name: '',
-        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -520,19 +455,6 @@ export const abi = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'totalAvailable',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
     inputs: [
       {
         internalType: 'uint256',
@@ -552,35 +474,76 @@ export const abi = [
         name: 'timestamp',
         type: 'uint256',
       },
-      {
-        internalType: 'uint256',
-        name: 'interestRate',
-        type: 'uint256',
-      },
     ],
     stateMutability: 'view',
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'updateInterestRate',
-    outputs: [
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
       {
         internalType: 'uint256',
         name: '',
         type: 'uint256',
       },
     ],
-    stateMutability: 'nonpayable',
+    name: 'userLoans',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'nonce',
+        type: 'uint256',
+      },
+      {
+        internalType: 'address',
+        name: 'borrower',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'loanSize',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'collateral',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'interestSubtracted',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'borrowedDate',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'dueDate',
+        type: 'uint256',
+      },
+      {
+        internalType: 'bool',
+        name: 'payedBack',
+        type: 'bool',
+      },
+      {
+        internalType: 'bool',
+        name: 'liquidated',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
   {
     inputs: [
-      {
-        internalType: 'uint256',
-        name: '_nonce',
-        type: 'uint256',
-      },
       {
         internalType: 'uint256',
         name: '_amount',
@@ -590,19 +553,6 @@ export const abi = [
     name: 'withdrawFunds',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'year',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
 ] as const

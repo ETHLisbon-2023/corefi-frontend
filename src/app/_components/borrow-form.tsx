@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/button'
 import {
   Card,
   CardContent,
@@ -20,12 +20,11 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
-import { toast } from '@/components/ui/use-toast'
+import { useAction } from '@/hooks/use-action'
 import { useContract } from '@/hooks/use-contract'
+import { useCoreTokenPrice } from '@/hooks/use-core-token-price'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
-import { parseErrors } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { use } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -40,10 +39,11 @@ type Props = {
   coingeckoPromise: Promise<{ coredaoorg: { usd: number } }>
 }
 
-export function BorrowForm({ coingeckoPromise }: Props) {
-  const course = use(coingeckoPromise)
+export function BorrowForm() {
+  const course = useCoreTokenPrice()
   const { address, open } = useWalletConnect()
   const { borrow } = useContract()
+  const { action, isLoading } = useAction()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
@@ -53,7 +53,7 @@ export function BorrowForm({ coingeckoPromise }: Props) {
     resolver: zodResolver(FormSchema),
   })
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: z.infer<typeof FormSchema>) {
     if (!address) {
       open()
       return
@@ -62,26 +62,19 @@ export function BorrowForm({ coingeckoPromise }: Props) {
     const ratio = data.ratio[0]
     const amount = Number(data.amount)
 
-    try {
-      await borrow({
-        args: [BigInt(31536000), BigInt(amount * 1000000)],
-        value: BigInt(
-          Math.floor(amount * ratio * (1 / course.coredaoorg.usd) * 1e18),
-        ),
-      })
+    action({
+      run: async () => {
+        await borrow({
+          args: [BigInt(2592000), BigInt(amount * 1000000)],
+          value: BigInt(
+            Math.floor(amount * ratio * (1 / course.coredaoorg.usd) * 1e18),
+          ),
+        })
 
-      toast({
-        description: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}.`,
-        title: 'Success!',
-      })
-    } catch (e) {
-      console.error(e)
-      toast({
-        description: parseErrors((e as any)?.message as string),
-        title: 'Error',
-        variant: 'destructive',
-      })
-    }
+        form.reset()
+      },
+      successMessage: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}.`,
+    })
   }
 
   return (
@@ -89,8 +82,11 @@ export function BorrowForm({ coingeckoPromise }: Props) {
       <CardHeader>
         <CardTitle>Borrow</CardTitle>
         <CardDescription>
-          Secure a USDT loan using your Core tokens as collateral. Just enter
-          the amount, adjust the collateral ratio, and confirm.
+          Secure a{' '}
+          <span className="font-medium text-black dark:text-white">30-day</span>{' '}
+          USDT loan using your Core tokens as collateral. Just enter the amount,
+          adjust the collateral ratio, and confirm. Quick, seamless, and
+          automated.
           <br />
           <br />
           Core token (CORE) is currently priced at{' '}
@@ -160,7 +156,7 @@ export function BorrowForm({ coingeckoPromise }: Props) {
         </Form>
       </CardContent>
       <CardFooter>
-        <Button form="borrow-form" type="submit">
+        <Button form="borrow-form" isLoading={isLoading} type="submit">
           Submit
         </Button>
       </CardFooter>

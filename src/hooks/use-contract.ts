@@ -1,9 +1,7 @@
-import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { abi, coreFiContractAddress, usdtContractAddress } from '@/lib/const'
-import { erc20ABI, useContractRead, useContractWrite } from 'wagmi'
+import { erc20ABI, useContractWrite } from 'wagmi'
 
 export function useContract() {
-  const { address } = useWalletConnect()
   const { writeAsync: lend } = useContractWrite({
     abi,
     address: coreFiContractAddress,
@@ -13,12 +11,6 @@ export function useContract() {
     abi,
     address: coreFiContractAddress,
     functionName: 'borrow',
-  })
-  const { data: usdtBalance } = useContractRead({
-    abi: erc20ABI,
-    address: usdtContractAddress,
-    args: [address!, coreFiContractAddress],
-    functionName: 'allowance',
   })
   const { writeAsync: approve } = useContractWrite({
     abi: erc20ABI,
@@ -30,6 +22,5 @@ export function useContract() {
     approve,
     borrow,
     lend,
-    usdtBalance,
   }
 }

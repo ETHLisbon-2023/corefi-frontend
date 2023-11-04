@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { PropsWithChildren } from 'react'
 
+import { Header } from '@/components/header'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { WagmiConfig } from '@/components/wagmi-config'
@@ -32,7 +33,12 @@ export default function RootLayout({ children }: PropsWithChildren) {
           disableTransitionOnChange
           enableSystem
         >
-          <WagmiConfig>{children}</WagmiConfig>
+          <WagmiConfig>
+            <div className="min-h-full">
+              <Header />
+              <main className="grid grid-cols-1 md:mt-10">{children}</main>
+            </div>
+          </WagmiConfig>
           <Toaster />
         </ThemeProvider>
       </body>
