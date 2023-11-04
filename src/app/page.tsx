@@ -20,7 +20,11 @@ export default function Home() {
             <LendForm />
           </TabsContent>
           <TabsContent value="borrow">
-            <BorrowForm />
+            <BorrowForm
+              coingeckoPromise={fetch(
+                'https://api.coingecko.com/api/v3/simple/price?ids=coredaoorg&vs_currencies=usd',
+              ).then(res => res.json())}
+            />
           </TabsContent>
         </Tabs>
       </main>

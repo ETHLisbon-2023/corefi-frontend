@@ -9,8 +9,6 @@ import { coreDao } from 'wagmi/chains'
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string
 
-console.log(process.env)
-
 const metadata = {
   description: 'Web3Modal Example',
   icons: ['https://avatars.githubusercontent.com/u/37784886'],

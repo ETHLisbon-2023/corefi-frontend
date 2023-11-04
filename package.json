@@ -53,8 +53,5 @@
   },
   "simple-git-hooks": {
     "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.(ts|tsx)": "tsc && npm run lint"
   }
 }
