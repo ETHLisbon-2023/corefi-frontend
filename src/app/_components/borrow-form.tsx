@@ -23,10 +23,8 @@ import { Slider } from '@/components/ui/slider'
 import { toast } from '@/components/ui/use-toast'
 import { useContract } from '@/hooks/use-contract'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
-import { coreFiContractAddress } from '@/lib/const'
 import { parseErrors } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { waitForTransaction } from '@wagmi/core'
 import { use } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -50,7 +48,7 @@ export function BorrowForm({ coingeckoPromise }: Props) {
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
       amount: '',
-      ratio: [0.1],
+      ratio: [1.5],
     },
     resolver: zodResolver(FormSchema),
   })
@@ -66,20 +64,11 @@ export function BorrowForm({ coingeckoPromise }: Props) {
 
     try {
       await borrow({
-        args: [BigInt(31536000), BigInt(1 * 1000000)],
+        args: [BigInt(31536000), BigInt(amount * 1000000)],
         value: BigInt(
           Math.floor(amount * ratio * course.coredaoorg.usd * 1000000),
         ),
       })
-      console.log(
-        BigInt(Math.floor(amount * ratio * course.coredaoorg.usd * 1000000)),
-      )
-      // await borrow({
-      //   args: [BigInt(31536000), BigInt(amount * 1000000)],
-      //   value: BigInt(
-      //     Math.floor(amount * ratio * course.coredaoorg.usd * 1000000),
-      //   ),
-      // })
 
       toast({
         description: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}. The equivalent of ${
@@ -159,7 +148,7 @@ export function BorrowForm({ coingeckoPromise }: Props) {
                     <Slider
                       {...field}
                       max={3}
-                      min={0.1}
+                      min={1.5}
                       onValueChange={value => {
                         field.onChange(value)
                       }}
