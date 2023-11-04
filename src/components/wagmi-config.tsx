@@ -3,11 +3,13 @@
 import type { PropsWithChildren } from 'react'
 
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
+import { defineChain } from 'viem'
 import { WagmiConfig as Config } from 'wagmi'
 import { coreDao } from 'wagmi/chains'
-import { defineChain } from 'viem'
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string
+
+console.log(process.env)
 
 const metadata = {
   description: 'Web3Modal Example',
@@ -17,21 +19,24 @@ const metadata = {
 }
 
 const coreDaoTestnet = defineChain({
+  blockExplorers: {
+    default: { name: 'CoreDaoTestnet', url: 'https://scan.test.btcs.network' },
+    etherscan: {
+      name: 'CoreDaoTestnet',
+      url: 'https://scan.test.btcs.network',
+    },
+  },
   id: 1115,
   name: 'Core Testnet',
-  network: 'coreDao testnet',
   nativeCurrency: {
     decimals: 18,
     name: 'Core Testnet',
     symbol: 'tCORE',
   },
+  network: 'coreDao testnet',
   rpcUrls: {
-    public: { http: ['https://rpc.test.btcs.network'] },
     default: { http: ['https://rpc.test.btcs.network'] },
-  },
-  blockExplorers: {
-    default: { name: 'CoreDaoTestnet', url: 'https://scan.test.btcs.network' },
-    etherscan: { name: 'CoreDaoTestnet', url: 'https://scan.test.btcs.network' },
+    public: { http: ['https://rpc.test.btcs.network'] },
   },
   testnet: true,
 })
