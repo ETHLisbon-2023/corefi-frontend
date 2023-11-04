@@ -55,6 +55,6 @@
     "pre-commit": "lint-staged"
   },
   "lint-staged": {
-    "*.(ts|tsx)": "npm run lint"
+    "*.(ts|tsx)": "tsc && npm run lint"
   }
 }
