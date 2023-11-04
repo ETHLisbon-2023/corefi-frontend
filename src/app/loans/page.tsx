@@ -20,8 +20,7 @@ import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { abi, coreFiContractAddress } from '@/lib/const'
 import { formatCoreTokens, formatTimestamp, formatUsdt } from '@/lib/utils'
 import { waitForTransaction } from '@wagmi/core'
-import { useEffect, useState } from 'react'
-import { useContractRead, useContractWrite, useTransaction } from 'wagmi'
+import { useContractRead, useContractWrite } from 'wagmi'
 
 const contract = {
   abi,
@@ -30,11 +29,7 @@ const contract = {
 
 export default function Loans() {
   const course = useCoreTokenPrice()
-  const [hash, setHash] = useState<`0x${string}` | undefined>()
   const { address, isConnected, isConnecting } = useWalletConnect()
-  const { data: ltv } = useTransaction({
-    hash,
-  })
   const { approve } = useContract()
   const { data: loans } = useContractRead({
     ...contract,
@@ -43,27 +38,12 @@ export default function Loans() {
     watch: true,
   })
 
-  const { writeAsync: checkLTV } = useContractWrite({
-    ...contract,
-    functionName: 'checkLTV',
-  })
-
   const { writeAsync: payBack } = useContractWrite({
     ...contract,
     functionName: 'repayBorrow',
   })
 
   const { action, isLoading } = useAction()
-
-  useEffect(() => {
-    console.log(ltv, hash)
-    if (ltv) {
-      toast({
-        description: `Your LTV is ${ltv?.value.toString()}%`,
-        title: 'Success!',
-      })
-    }
-  }, [ltv])
 
   if (isConnecting) {
     return (
