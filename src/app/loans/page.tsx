@@ -12,13 +12,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { useAction } from '@/hooks/use-action'
-import { useContract } from '@/hooks/use-contract'
 import { useCoreTokenPrice } from '@/hooks/use-core-token-price'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { abi, coreFiContractAddress } from '@/lib/const'
 import { formatCoreTokens, formatTimestamp, formatUsdt } from '@/lib/utils'
-import { useContractRead, useContractWrite } from 'wagmi'
+import { useContractRead } from 'wagmi'
 
 const contract = {
   abi,
@@ -28,20 +26,12 @@ const contract = {
 export default function Loans() {
   const course = useCoreTokenPrice()
   const { address, isConnected, isConnecting } = useWalletConnect()
-  const { approve } = useContract()
   const { data: loans } = useContractRead({
     ...contract,
     args: [address!],
     functionName: 'getUserLoans',
     watch: true,
   })
-
-  const { writeAsync: payBack } = useContractWrite({
-    ...contract,
-    functionName: 'repayBorrow',
-  })
-
-  const { action, isLoading } = useAction()
 
   if (isConnecting) {
     return (
