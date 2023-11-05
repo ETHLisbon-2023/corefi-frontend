@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/button'
 import {
   Card,
   CardContent,
@@ -20,7 +20,9 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
-import { toast } from '@/components/ui/use-toast'
+import { useAction } from '@/hooks/use-action'
+import { useContract } from '@/hooks/use-contract'
+import { useCoreTokenPrice } from '@/hooks/use-core-token-price'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -33,8 +35,15 @@ const FormSchema = z.object({
   ratio: z.array(z.number()),
 })
 
+type Props = {
+  coingeckoPromise: Promise<{ coredaoorg: { usd: number } }>
+}
+
 export function BorrowForm() {
+  const course = useCoreTokenPrice()
   const { address, open } = useWalletConnect()
+  const { borrow } = useContract()
+  const { action, isLoading } = useAction()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
@@ -53,11 +62,18 @@ export function BorrowForm() {
     const ratio = data.ratio[0]
     const amount = Number(data.amount)
 
-    toast({
-      description: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}. The equivalent of ${
-        amount * ratio
-      } USDT in Core tokens has been automatically reserved as collateral from your account.`,
-      title: 'Success!',
+    action({
+      run: async () => {
+        await borrow({
+          args: [BigInt(2592000), BigInt(amount * 1000000)],
+          value: BigInt(
+            Math.floor(amount * ratio * (1 / course.coredaoorg.usd) * 1e18),
+          ),
+        })
+
+        form.reset()
+      },
+      successMessage: `Your loan request has been successfully processed! You are borrowing ${amount} USDT with a collateral ratio of ${ratio}.`,
     })
   }
 
@@ -66,8 +82,18 @@ export function BorrowForm() {
       <CardHeader>
         <CardTitle>Borrow</CardTitle>
         <CardDescription>
-          Secure a USDT loan using your Core tokens as collateral. Just enter
-          the amount, adjust the collateral ratio, and confirm.
+          Secure a{' '}
+          <span className="font-medium text-black dark:text-white">30-day</span>{' '}
+          USDT loan using your Core tokens as collateral. Just enter the amount,
+          adjust the collateral ratio, and confirm. Quick, seamless, and
+          automated.
+          <br />
+          <br />
+          Core token (CORE) is currently priced at{' '}
+          <span className="font-medium text-black dark:text-white">
+            {course.coredaoorg.usd.toFixed(2)}
+          </span>{' '}
+          USDT.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -80,8 +106,25 @@ export function BorrowForm() {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input placeholder="1000 USDT" type="number" {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="1000 USDT"
+                      type="number"
+                      {...field}
+                    />
                   </FormControl>
+                  <FormDescription>
+                    Collateral:{' '}
+                    <span className="font-medium text-black dark:text-white">
+                      {(
+                        Number(field.value) *
+                        Number(form.watch('ratio')) *
+                        (1 / course.coredaoorg.usd)
+                      ).toFixed(2)}
+                    </span>{' '}
+                    CORE (Core token price is not updated automatically, the
+                    final collateral amount may vary)
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -113,7 +156,7 @@ export function BorrowForm() {
         </Form>
       </CardContent>
       <CardFooter>
-        <Button form="borrow-form" type="submit">
+        <Button form="borrow-form" isLoading={isLoading} type="submit">
           Submit
         </Button>
       </CardFooter>

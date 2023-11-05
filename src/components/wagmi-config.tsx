@@ -3,10 +3,12 @@
 import type { PropsWithChildren } from 'react'
 
 import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react'
+import { defineChain } from 'viem'
 import { WagmiConfig as Config } from 'wagmi'
 import { coreDao } from 'wagmi/chains'
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID as string
+const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === 'true'
 
 const metadata = {
   description: 'Web3Modal Example',
@@ -15,7 +17,30 @@ const metadata = {
   url: 'https://web3modal.com',
 }
 
-const chains = [coreDao]
+const coreDaoTestnet = defineChain({
+  blockExplorers: {
+    default: { name: 'CoreDaoTestnet', url: 'https://scan.test.btcs.network' },
+    etherscan: {
+      name: 'CoreDaoTestnet',
+      url: 'https://scan.test.btcs.network',
+    },
+  },
+  id: 1115,
+  name: 'Core Testnet',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Core Testnet',
+    symbol: 'tCORE',
+  },
+  network: 'coreDao testnet',
+  rpcUrls: {
+    default: { http: ['https://rpc.test.btcs.network'] },
+    public: { http: ['https://rpc.test.btcs.network'] },
+  },
+  testnet: true,
+})
+
+const chains = [isTestnet ? coreDaoTestnet : coreDao]
 const wagmiConfig = defaultWagmiConfig({ chains, metadata, projectId })
 
 createWeb3Modal({
@@ -23,6 +48,7 @@ createWeb3Modal({
   projectId,
   themeVariables: {
     '--w3m-font-family': 'Martian Mono, monospace',
+    '--w3m-font-size-master': '8px',
   },
   wagmiConfig,
 })

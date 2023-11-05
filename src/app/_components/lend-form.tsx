@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/button'
 import {
   Card,
   CardContent,
@@ -18,9 +18,12 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toast } from '@/components/ui/use-toast'
+import { useAction } from '@/hooks/use-action'
+import { useContract } from '@/hooks/use-contract'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
+import { coreFiContractAddress } from '@/lib/const'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { waitForTransaction } from '@wagmi/core'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -32,6 +35,8 @@ const FormSchema = z.object({
 
 export function LendForm() {
   const { address, open } = useWalletConnect()
+  const { approve, lend } = useContract()
+  const { action, isLoading } = useAction()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     defaultValues: {
@@ -46,9 +51,21 @@ export function LendForm() {
       return
     }
 
-    toast({
-      description: `Your transaction has been successfully completed! You have lent out ${data.amount} USDT.`,
-      title: 'Success!',
+    action({
+      run: async () => {
+        const amount = BigInt(Number(data.amount) * 1000000)
+
+        const { hash } = await approve({
+          args: [coreFiContractAddress, amount],
+        })
+        await waitForTransaction({ hash })
+        await lend({
+          args: [amount],
+        })
+
+        form.reset()
+      },
+      successMessage: `Your transaction has been successfully completed! You have lent out ${data.amount} USDT.`,
     })
   }
 
@@ -73,7 +90,12 @@ export function LendForm() {
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input placeholder="1000 USDT" type="number" {...field} />
+                    <Input
+                      autoComplete="off"
+                      placeholder="1000 USDT"
+                      type="number"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -82,10 +104,17 @@ export function LendForm() {
           </form>
         </Form>
       </CardContent>
-      <CardFooter>
-        <Button form="lend-form" type="submit">
+      <CardFooter className="block">
+        <Button form="lend-form" isLoading={isLoading} type="submit">
           Submit
         </Button>
+        {isLoading && (
+          <CardDescription className="mt-2 text-sm">
+            Your transaction is being processed... Please stay on the page. The
+            transaction may take 5-7 seconds to complete. We appreciate your
+            patience!
+          </CardDescription>
+        )}
       </CardFooter>
     </Card>
   )
