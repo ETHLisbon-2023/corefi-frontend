@@ -1,6 +1,6 @@
 'use client'
 
-import { Button } from '@/components/button'
+import { PaybackButton } from '@/app/loans/_components/payback-button'
 import { ConnectButton } from '@/components/header'
 import { Spinner } from '@/components/spinner'
 import { CardTitle } from '@/components/ui/card'
@@ -12,14 +12,12 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { toast } from '@/components/ui/use-toast'
 import { useAction } from '@/hooks/use-action'
 import { useContract } from '@/hooks/use-contract'
 import { useCoreTokenPrice } from '@/hooks/use-core-token-price'
 import { useWalletConnect } from '@/hooks/use-wallet-connect'
 import { abi, coreFiContractAddress } from '@/lib/const'
 import { formatCoreTokens, formatTimestamp, formatUsdt } from '@/lib/utils'
-import { waitForTransaction } from '@wagmi/core'
 import { useContractRead, useContractWrite } from 'wagmi'
 
 const contract = {
@@ -108,25 +106,7 @@ export default function Loans() {
               <TableCell>{formatTimestamp(loan.dueDate)}</TableCell>
               <TableCell className="min-w-[160px] text-right">
                 {!loan.payedBack && !loan.liquidated ? (
-                  <Button
-                    isLoading={isLoading}
-                    onClick={() => {
-                      action({
-                        run: async () => {
-                          const { hash } = await approve({
-                            args: [coreFiContractAddress, loan.loanSize],
-                          })
-                          await waitForTransaction({ hash })
-                          await payBack({
-                            args: [loan.nonce, address!, loan.loanSize],
-                          })
-                        },
-                        successMessage: `Your loan is paid!`,
-                      })
-                    }}
-                  >
-                    Pay Back
-                  </Button>
+                  <PaybackButton amount={loan.loanSize} nonce={loan.nonce} />
                 ) : null}
               </TableCell>
             </TableRow>

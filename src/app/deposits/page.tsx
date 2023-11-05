@@ -164,8 +164,6 @@ export default function Deposits() {
     }
   }
 
-  console.log(deposits)
-
   return (
     <div className="mx-auto mb-8 mt-8 w-full max-w-6xl px-4">
       {deposits && deposits.length > 0 ? (
